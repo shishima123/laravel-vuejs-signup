@@ -1,7 +1,6 @@
 <template>
     <div id="app">
         <header-section />
-        <button @click="getCurrentUser">User</button>
         <router-view></router-view>
     </div>
 </template>

@@ -1,5 +1,6 @@
 import App from '../App';
 import Auth from '../components/Auth/auth';
+import Home from '../components/home'
 export default [
     // Home
     {
@@ -8,7 +9,13 @@ export default [
         component: App,
         meta: {
             requiresAuth: true
-        }
+        }, children: [
+            {
+                path: '',
+                component: Home,
+            }
+        ]
+
     },
 
     // Login
