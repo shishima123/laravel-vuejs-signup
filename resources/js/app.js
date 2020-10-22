@@ -1,32 +1,47 @@
-/**
- * First we will load all of this project's JavaScript dependencies which
- * includes Vue and other libraries. It is a great starting point when
- * building robust, powerful web applications using Vue and Laravel.
- */
-
 require('./bootstrap');
+
+import VueRouter from 'vue-router'
+import routes from './routes/index'
+import axios from 'axios'
+import VueAxios from 'vue-axios'
+import Toasted from 'vue-toasted';
 
 window.Vue = require('vue');
 
-/**
- * The following block of code may be used to automatically register your
- * Vue components. It will recursively scan this directory for the Vue
- * components and automatically register them with their "basename".
- *
- * Eg. ./components/ExampleComponent.vue -> <example-component></example-component>
- */
+window.Vue.use(VueRouter);
 
-// const files = require.context('./', true, /\.vue$/i)
-// files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
+window.Vue.config.productionTip = false
+window.Vue.config.devtools = true
 
-Vue.component('example-component', require('./components/ExampleComponent.vue').default);
+window.Vue.use(VueAxios, axios)
 
-/**
- * Next, we will create a fresh Vue application instance and attach it to
- * the page. Then, you may begin adding components to this application
- * or customize the JavaScript scaffolding to fit your unique needs.
- */
+let option = {
+    theme: "toasted-primary",
+    position: "top-right",
+    duration : 5000
+};
 
-const app = new Vue({
-    el: '#app',
-});
+Vue.use(Toasted, option)
+
+const router = new VueRouter({ routes })
+
+router.beforeEach((to, from, next) => {
+    const isLoggedIn = localStorage.hasOwnProperty('user-token');
+
+    // Redirect to the login page if the user is not logged in
+    // and the route meta record is requires auth
+    if (to.matched.some(record => record.meta.requiresAuth) && !isLoggedIn) {
+        next('/login')
+    }
+
+    // Redirect to the homepage page if the user is logged in
+    // and the route meta record is requires guest
+    if (to.matched.some(record => record.meta.requiresGuest) && isLoggedIn) {
+        next('/')
+    }
+
+    // Pass any access if not match two conditions above
+    next()
+})
+
+const app = new Vue({ router }).$mount('#app')
